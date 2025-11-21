@@ -8,14 +8,20 @@ class game():
         self.screen = pygame.display.set_mode((700,700))
         self.clock = pygame.time.Clock()
         self.running = True
+        self.score = 0
         self.state = 0
     #sprite groups
-        self.menu_group = pygame.sprite.Group()
-    #text
+        self.menu_text_group = pygame.sprite.Group()
+        self.game_group = pygame.sprite.Group()
+    #sprites
+        #menu
         self.menu_text1 = text(100,'Snake',(32,36,2),(350,350))
         self.menu_text2 = text(20,'Press space to start',(67,74,5),(350,600))
-        self.menu_group.add(self.menu_text1,self.menu_text2)
-    
+        self.menu_text_group.add(self.menu_text1,self.menu_text2)
+        #game
+        self.score_text = text(50,f'Score : {self.score}',(32,36,2),(350,60))
+        self.game_group.add(self.score_text)
+
     def run(self):
         while self.running:
             if self.state == 0:
@@ -45,10 +51,16 @@ class game():
     def menu(self):
         self.input()
         self.screen.fill((218, 232, 88))
-        self.menu_group.draw(self.screen)
+        self.menu_text_group.draw(self.screen)
 
         pygame.display.update()
 
+    def game(self):
+        self.input()
+        self.screen.fill((218, 232, 88))
+        self.game_group.draw(self.screen) 
+
+        pygame.display.update()
 
 class text(pygame.sprite.Sprite):
     def __init__(self,font_size: int,text: str,color: tuple,position: tuple):
