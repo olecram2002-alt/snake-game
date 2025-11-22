@@ -79,7 +79,8 @@ class Game():
                     if event.key == pygame.K_d:
                         self.player.direction = [1,0]
                 if event.type == self.body_gen:
-                    pass
+                    self.sprites[f'snake_{self.score}'] = Body(self)
+                    self.game_obstacle_group.add(self.sprites[f'snake_{self.score}'])
 
     def menu(self):
         self.input()
@@ -126,10 +127,18 @@ class Snake(pygame.sprite.Sprite):
 
     def collision_detect(self):
         for sprite in self.game.game_obstacle_group:
-            if self.rect.colliderect(sprite.rect):
+
+        #check for collision
+            if self.rect.colliderect(sprite.rect) and not sprite.recently_created:
                 self.game.state = 2
 
+        #activate collision with new body part
+            if hasattr(sprite,'recently_created') and not self.rect.colliderect(sprite.rect):
+                sprite.recently_created = False
+
         for sprite in self.game.game_collectable_group:
+
+        #check for eating fruit
             if self.rect.colliderect(sprite.rect):
                 self.game.score += 1
                 self.game.sprites['score text'].update(f'Score : {self.game.score}',(32,36,2))
@@ -147,14 +156,15 @@ class Snake(pygame.sprite.Sprite):
 class Body(pygame.sprite.Sprite):
     def __init__(self,game):
         super().__init__()
+        self.game = game
         self.image = pygame.Surface((30,30))
         self.image.fill((32,36,2))
-        self.rect = self.image.get_rect(center=(350,350))
+        self.rect = self.image.get_rect(center=(self.game.sprites[f'snake_{self.game.score - 1}'].rect.center))
 
-        self.game = game
+        self.recently_created = True
         self.velocity = [5,5]
         self.direction = [0,0]
-
+        
 class Fruit(pygame.sprite.Sprite):
     def __init__(self,x:int,y:int):
         super().__init__()
