@@ -13,6 +13,9 @@ class Game():
         self.running = True
         self.score = 0
         self.state = 0
+
+        self.body_gen = pygame.USEREVENT + 1
+        self.body_gen_event = pygame.event.Event(self.body_gen)
     #sprite groups
         self.menu_text_group = pygame.sprite.Group()
         self.game_over_group = pygame.sprite.Group()
@@ -75,6 +78,8 @@ class Game():
                         self.player.direction = [-1,0]
                     if event.key == pygame.K_d:
                         self.player.direction = [1,0]
+                if event.type == self.body_gen:
+                    pass
 
     def menu(self):
         self.input()
@@ -132,6 +137,8 @@ class Snake(pygame.sprite.Sprite):
 
                 self.game.sprites['fruit'] = Fruit(randint(25,675),randint(95,675))
                 self.game.game_collectable_group.add(self.game.sprites['fruit'])
+
+                pygame.event.post(self.game.body_gen_event)
 
     def update(self):
         self.movement()
