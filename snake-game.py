@@ -22,6 +22,7 @@ class Game():
             'menu text1':Text(self.font,'Snake',200,(32,36,2),(350,350)),
             'menu text2':Text(self.font,'Press space to start',50,(67,74,5),(350,600)),
             'game text1':Text(self.font,'Score: 0',50,(32,36,2),(350,35)),
+            'game over text1':Text(self.font,'Game Over',200,(32,36,2),(350,350)),
             'wall left':Wall([0,0]),'wall right':Wall([0,1]),'wall bot':Wall([1,0]),'wall top':Wall([1,1]),
             'fruit':Fruit()}
 
@@ -29,6 +30,7 @@ class Game():
         self.game_sprites = pygame.sprite.Group(self.sprites['game text1'],self.sprites['wall left'],
                                                 self.sprites['wall right'],self.sprites['wall bot'],
                                                 self.sprites['wall top'],self.sprites['fruit'])
+        self.game_over_sprites = pygame.sprite.Group(self.sprites['game over text1'])
         
         for index,part in enumerate(self.snake_body):
             self.sprites[f'snake body{index}'] = SnakePart(part)
@@ -101,6 +103,13 @@ class Game():
 
         pygame.display.update()
 
+    def game_over(self):
+        self.input()
+        self.screen.fill((218, 232, 88))
+        self.game_over_sprites.draw(self.screen)
+
+        pygame.display.update()
+
     def movement(self):
         x,y = self.snake_body[-1]
         self.snake_body.append((x+20*(self.move[0]),y+20*(self.move[1])))
@@ -120,6 +129,7 @@ class SnakePart(pygame.sprite.Sprite):
                 if sprite.name == 'fruit':
                     eat = True
                     game.score += 1
+                    game.sprites['game text1'].rerender(f'Score: {game.score}')
                     sprite.kill()
                     game.game_sprites.add(Fruit())
                 if sprite.name == 'wall':
@@ -139,12 +149,13 @@ class Text(pygame.sprite.Sprite):
     def __init__(self, font_location:str, text:str, size:int, color:tuple, location:tuple ):
         super().__init__()
         self.name = 'text'
+        self.color = color
         self.font = pygame.font.Font(font_location,size)
-        self.image = self.font.render(text,False,color)
+        self.image = self.font.render(text,False,self.color)
         self.rect = self.image.get_rect(center=location)
 
-    def render(self,new_size:int ,new_text:str ,new_color:tuple):
-        pass
+    def rerender(self,new_text:str):
+        self.image = self.font.render(new_text,False,self.color)
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, index:list):
